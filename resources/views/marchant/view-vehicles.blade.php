@@ -58,7 +58,8 @@
                   <th>Color</th>
                   <th>No of Cylinder</th>
                   <!-- <th>Description</th> -->
-                  <th>Sale Price</th>
+                  <th>Last P.Price</th>
+                  <th>Last P.Qty</th>
 {{--                  <th>Showroom Name</th>--}}
 {{--                  <th>Address</th>--}}
 {{--                  <th>Contact</th>--}}
@@ -96,7 +97,8 @@
                   <td>{{ $vehicle->color }}</td>
                   <td>{{ $vehicle->no_of_cylinder }}</td>
                   <!-- <td>{{ $vehicle->description }}</td> -->
-                  <td>{{ $vehicle->sale_price }}</td>
+                  <td>{{ $vehicle->cost_price }}</td>
+                  <td>{{ $vehicle->qty }}</td>
 {{--                  <td>{{ $vehicle->showroom_name }}</td>--}}
 {{--                  <td>{{ $vehicle->address }}</td>--}}
 {{--                  <td>{{ $vehicle->contact }}</td>--}}

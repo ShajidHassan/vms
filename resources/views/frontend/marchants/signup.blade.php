@@ -86,7 +86,7 @@
                     </div>
                     <div class="signup-image">
                         <figure><img src="{{ asset('img/signup-image.jpg') }}" alt="sing up image"></figure>
-                        <a href="{{\Illuminate\Support\Facades\URL::route("admin.signin")}}" class="signup-image-link">I am already member</a>
+                        <a href="{{\Illuminate\Support\Facades\URL::route("marchant.signin")}}" class="signup-image-link">I am already member</a>
                     </div>
                 </div>
             </div>

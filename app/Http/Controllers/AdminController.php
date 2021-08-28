@@ -231,11 +231,10 @@ class AdminController extends Controller
     public function transaction()
     {
         $this->checkPermission();
-//        $accountNumbers = Account::where("holder_ref", Session::get('user_id'))->pluck('acc_no')->toArray();
-//        $allTransactions = Transaction::whereIn("from_account", $accountNumbers)->orderBy("created_at","DESC")->get();
-        $allTransactions = Transaction::where("trans_by", Session::get('admin_id'))
-            ->orWhere("trans_for", "supper-admin")
-            ->orderBy("created_at","DESC")->get();
+//        $allTransactions = Transaction::where("trans_by", Session::get('admin_id'))
+//            ->orWhere("trans_for", "super-admin")
+//            ->orderBy("created_at","DESC")->get();
+        $allTransactions = Transaction::orderBy("created_at","DESC")->get();
         return view('admin.transactions', compact('allTransactions'));
     }
 

@@ -23,11 +23,10 @@ class UserController extends Controller
     public function transaction()
     {
         $this->checkPermission();
-        $accountNumbers = Account::where("holder_ref", Session::get('user_id'))->pluck('acc_no')->toArray();
-//        $allTransactions = Transaction::whereIn("from_account", $accountNumbers)->orderBy("created_at","DESC")->get();
         $allTransactions = Transaction::where("trans_by", Session::get('user_id'))
             ->where("trans_for", "user")
-            ->orderBy("created_at","DESC")->get();
+            ->orderBy("created_at","DESC")
+            ->get();
         return view('users.transactions', compact('allTransactions'));
     }
 
@@ -225,7 +224,6 @@ class UserController extends Controller
             'acc_number.unique' => 'Account already exist'
         ];
     }
-
 
     public function account()
     {

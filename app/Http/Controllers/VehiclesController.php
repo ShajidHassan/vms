@@ -115,6 +115,7 @@ class VehiclesController extends Controller
                         //Vehicle owner transaction
                         $brandTransaction = new Transaction();
                         $brandTransaction->trans_by = $bookerId;
+                        $brandTransaction->vechicle_id = $vid;
                         $brandTransaction->trans_for = "merchant";
                         $brandTransaction->from_account = $bookerAccount->acc_no;
                         $brandTransaction->to_account = $brandAccount->acc_no;
@@ -130,6 +131,7 @@ class VehiclesController extends Controller
 
                         //booker transaction
                         $bookerTransaction = new Transaction();
+                        $bookerTransaction->vechicle_id = $vid;
                         $bookerTransaction->trans_by = $bookerId;
                         $bookerTransaction->trans_for = "user";
                         $bookerTransaction->from_account = $bookerAccount->acc_no;
@@ -150,6 +152,7 @@ class VehiclesController extends Controller
                         $siteAccount->save();
 
                         $siteOwnerTransaction = new Transaction();
+                        $siteOwnerTransaction->vechicle_id = $vid;
                         $siteOwnerTransaction->trans_by = $bookerId;
                         $siteOwnerTransaction->trans_for = "super-admin";
                         $siteOwnerTransaction->from_account = $brandAccount->acc_no;
@@ -172,7 +175,8 @@ class VehiclesController extends Controller
                         return redirect()->route("home.index")->with(["message" => "Booking placed success"]);
 
                     }catch (\Exception $exception){
-                        return redirect()->back()->with(["message" => "Booking placed failed"]);
+                        dd($exception->getTrace());
+                        return redirect()->back()->with(["message_error" => "Booking placed failed"]);
                     }
                 } else {
                     return redirect()->back()->with(["message_error" => "Not sufficient amount for booking"]);
@@ -300,10 +304,10 @@ class VehiclesController extends Controller
         $this->checkPermission();
         $vehicles = DB::table('vehicles')
             ->join('admins', 'vehicles.admin_id', '=', 'admins.id')
-            ->join("solds","solds.vechicle_id", "=", "vehicles.id")
+            ->join("purchases","purchases.vechicle_id", "=", "vehicles.id")
             ->where('admin_id', '=', Session::get('marchant_id'))
             ->where('vehicles.deleted_at', '=', null)
-            ->selectRaw("vehicles.*,solds.sold_qty, solds.booking_rate,solds.sale_price,solds.show_room, solds.address, solds.phone AS contact, solds.booking_status")
+            ->selectRaw("vehicles.*, purchases.qty, purchases.cost_price, purchases.show_room_name, purchases.address, purchases.phone AS contact")
             ->get();
         foreach ($vehicles as $key => $val) {
             $category_name = Category::where(['id' => $val->category_id])->first();
