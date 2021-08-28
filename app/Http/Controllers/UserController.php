@@ -199,7 +199,7 @@ class UserController extends Controller
 
                 return redirect()->back()->with('message', 'Account updated Successfully.');
             }catch (\Exception $exception){
-                dd($exception->getMessage());
+              
                 return redirect()->back()->with('message_error', 'Update failed. due to server disconnection');
             }
         }else{

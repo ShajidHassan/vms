@@ -221,21 +221,24 @@ class MarchantController extends Controller
                 return redirect()->back()->withInput($request->except(["password"]))->withErrors($validator);
             }
 
-            $isInserted = DB:: table('accounts')->where("id", $accountId)->update(
-                [
-                    'acc_no' => $account->acc_no,
-                    'holder_ref' => $account->holder_ref,
-                    'holder_name' => $holderName,
-                    'amount' => $amount,
-                    'bank_name' => $bankName,
-                    'branch_name' => $branchName,
-                    'address' => $branchAddress,
-                ]);
+	    try {
+                DB:: table('accounts')
+                    ->where("id", $accountId)
+                    ->update(
+                        [
+                            'acc_no' => $account->acc_no,
+                            'holder_ref' => $account->holder_ref,
+                            'holder_name' => $holderName,
+                            'amount' => $amount,
+                            'bank_name' => $bankName,
+                            'branch_name' => $branchName,
+                            'address' => $branchAddress,
+                        ]);
 
-            if($isInserted)
                 return redirect()->back()->with('message', 'Account updated Successfully.');
-            else
+            }catch (\Exception $exception){
                 return redirect()->back()->with('message_error', 'Update failed. due to server disconnection');
+            }
 
         }else{
             return redirect()->back()->with('message_error','Request Method invalid');
