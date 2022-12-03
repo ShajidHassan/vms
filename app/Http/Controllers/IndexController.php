@@ -29,30 +29,34 @@ class IndexController extends Controller
 
     //============ all vehicles public action =========
 
-    public function vehicles($url = null){
+   public function vehicles($url = null){
         $countCategory = Category::where(['url'=>$url])->count();
         if($countCategory==0){
             abort(404);
         }
 
-        $categories = Category::with('categories')->where(['parent_id'=>0])->get();
+        $categories = Category::with('categories')->where(['parent_id' => 0])->get();
 
         $categoryDetails = Category::where(['url' => $url])->first();
 
+        $vehiclesAll = null;
+
         if($categoryDetails->parent_id == 0){
             $subCategories = Category::where(['parent_id'=>$categoryDetails->id])->get();
-            foreach($subCategories as $subcat){
-                $cat_ids[] = $subcat->id;
-            }
+            if($subCategories->count() > 0) {
+                foreach ($subCategories as $subcat) {
+                    $cat_ids[] = $subcat->id;
+                }
 
-            $vehiclesAll = DB::table("vehicles")
-                ->join("solds","solds.vechicle_id", "=", "vehicles.id")
-                ->where('vehicles.deleted_at','=', null)
-                ->where('solds.action','=', "on")
-                ->whereIn("category_id",$cat_ids)
-                ->selectRaw("vehicles.*,solds.sold_qty, solds.booking_rate,solds.sale_price,solds.show_room, solds.address, solds.phone AS contact, solds.booking_status")
-                ->orderBy('id','DESC')
-                ->distinct()->paginate(3);
+                $vehiclesAll = DB::table("vehicles")
+                    ->join("solds", "solds.vechicle_id", "=", "vehicles.id")
+                    ->where('vehicles.deleted_at', '=', null)
+                    ->where('solds.action', '=', "on")
+                    ->whereIn("category_id", $cat_ids)
+                    ->selectRaw("vehicles.*,solds.sold_qty, solds.booking_rate,solds.sale_price,solds.show_room, solds.address, solds.phone AS contact, solds.booking_status")
+                    ->orderBy('id', 'DESC')
+                    ->distinct()->paginate(3);
+            }
         }else{
             $vehiclesAll = DB::table("vehicles")
                 ->join("solds","solds.vechicle_id", "=", "vehicles.id")

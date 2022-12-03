@@ -57,7 +57,7 @@
                       <td>{{$transaction->tax_amount?? "NA"}}</td>
                       <td>{{$transaction->trans_type}}</td>
                       <td>{{$transaction->amount_type}}</td>
-                      <td><a href="{{\Illuminate\Support\Facades\URL::route("marchant.trans_action",['id' => $transaction->id])}}" >{!! \App\Helper::getStatus($transaction->status) !!}</a></td>
+                      <td><a href="{{\Illuminate\Support\Facades\URL::route("marchant.trans_action",['id' => $transaction->trans_key])}}" >{!! \App\Helper::getStatus($transaction->status) !!}</a></td>
                       <td>{{$transaction->created_at}}</td>
                       <td class="center">
 {{--                        <a href="{{\Illuminate\Support\Facades\URL::route("user.edit_account",['id' => $transaction->id])}}" class="btn btn-info btn" title="edit">Edit</a>--}}

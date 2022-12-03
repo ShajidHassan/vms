@@ -12,7 +12,9 @@ return [
     | any other location as required by the application or its packages.
     |
     */
+    'super_admin_id' => 2,
 
+    
     'name' => env('APP_NAME', 'Laravel'),
 
     /*

@@ -20,9 +20,9 @@
       @endif
   </div>
 <!--End-breadcrumbs-->
-{{-- <!-- <div class="container-fluid">--}}
+{{--  <div class="container-fluid">--}}
     <div class="quick-actions_homepage">
-      <ul class="quick-actions" style="float: right">
+      <ul class="quick-actions" style="float: center">
 {{--        <li class="bg_lb"> <a href="index.html"> <i class="icon-dashboard"></i> <span class="label label-important">20</span> My Dashboard </a> </li>--}}
 {{--        <li class="bg_lg span3"> <a href="charts.html"> <i class="icon-signal"></i> Charts</a> </li>--}}
 {{--        <li class="bg_ly"> <a href="widgets.html"> <i class="icon-inbox"></i><span class="label label-success">101</span> Widgets </a> </li>--}}
@@ -31,8 +31,8 @@
 {{--        <li class="bg_lo span3"> <a href="form-common.html"> <i class="icon-th-list"></i> Forms</a> </li>--}}
         <li class="bg_ls"> <a> <i class="icon-user"></i> Total Marchant ({{$totalMarchant ?? 0}})</a></li>
         <li class="bg_lb"> <a> <i class="icon-pencil"></i>Total Transaction({{$totalTransaction ?? 0}})</a> </li>
-        <li class="bg_lg"> <a> <i class="icon-calendar"></i>Today Profit({{$totalProfit->totalProfit ?? 0.00}}) BD</a> </li>
-        <li class="bg_lv"> <a> <i class="icon-info-sign"></i>Today Booking({{$todayTransaction ?? 0}})</a> </li>
+        <li class="bg_lg"> <a> <i class="icon-calendar"></i>Total Profit({{$totalProfit->totalProfit ?? 0.00}}) BD</a> </li>
+        <li class="bg_lv"> <a> <i class="icon-info-sign"></i>Today Booking({{ceil($todayTransaction / 3) ?? 0}})</a> </li>
         <li class="bg_db"> <a> <i class="icon-info-sign"></i>Today Profit({{$todayProfit->todayProfit ?? 0.00}})</a> </li>
 
       </ul>
@@ -45,7 +45,7 @@
       <span class="text2"><center><strong><i>Admin Panel</i></strong></center></font></span>
     </div>
  </section>
-{{--<!--Chart-box-->  --}}
+{{--<!--Chart-box  --}}
 {{--    <!----}}
 {{--    <div class="row-fluid">--}}
 {{--      <div class="widget-box">--}}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Account;
 use App\Helper;
 use App\Purchases;
@@ -15,6 +16,7 @@ use App\Category;
 use App\Vehicle;
 use App\VehiclesImage;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Config;
 
 class VehiclesController extends Controller
 {
@@ -51,7 +53,7 @@ class VehiclesController extends Controller
         }
     }
 
-    public function bookingConfirm(Request $request)
+   public function bookingConfirm(Request $request)
     {
         if ($request->isMethod('POST')) {
             $vid = intval($request->v_id);
@@ -59,6 +61,7 @@ class VehiclesController extends Controller
                 return redirect()->route("public.vechicle_details",['id' => $vid])->with(["message_error" => "Invalid Params supplied"]);
             }
 
+            $superAdminId = Config::get("app.super_admin_id");
             $bookingAmount = floatval($request->booking_amount);
             if ($bookingAmount < 0) {
                 return redirect()->back()->with(["message_error" => "Invalid Amount supplied"]);
@@ -101,7 +104,7 @@ class VehiclesController extends Controller
                     $brandAccount = Account::where([
                         'holder_ref' => $vehicleDetails->admin_id,
                         'holder_type' => "Marchant",
-                        'isDefault' => 1,
+                        /*'isDefault' => 1,*/
                         'acc_no' => $vehicleDetails->diposit_account
                     ])->first();
 
@@ -112,28 +115,36 @@ class VehiclesController extends Controller
                         $bookerAccount->amount -= $bookingAmount;
                         $bookerAccount->save();
 
-                        //Vehicle owner transaction
-                        $brandTransaction = new Transaction();
-                        $brandTransaction->trans_by = $bookerId;
-                        $brandTransaction->vechicle_id = $vid;
-                        $brandTransaction->trans_for = "merchant";
-                        $brandTransaction->from_account = $bookerAccount->acc_no;
-                        $brandTransaction->to_account = $brandAccount->acc_no;
-                        $brandTransaction->amount = $bookingAmount;
-                        $brandTransaction->tax = $tax;
-                        $brandTransaction->tax_amount = $taxAmount;
-                        $brandTransaction->net_amount = $netAmount;
-                        $brandTransaction->trans_type = "deposit";
-                        $brandTransaction->amount_type = "cash";
-                        $brandTransaction->note = "Amount deposit from: " . $bookerAccount->acc_no . " To My account: " . $brandAccount->acc_no . " for Booking. Booking Amount:" . $bookingAmount . "Tk  Tax:" . $tax . "% TaxAmount:" . $taxAmount . "Tk  You paid amount: " . $netAmount . "Tk" . " Admin cut: " . $taxAmount . " Tk";
-                        $brandTransaction->save();
+
+                        $trans_key = $this->generateTransKey();
+
+                        //Marchant transaction who is vehicle owner
+                        $marchantTransaction = new Transaction();
+                        $marchantTransaction->vechicle_id = $vid;
+                        $marchantTransaction->trans_by = "user";
+                        $marchantTransaction->trans_by_id = $bookerId;
+                        $marchantTransaction->trans_for = "merchant";
+                        $marchantTransaction->trans_for_id = $vehicleDetails->admin_id;
+                        $marchantTransaction->from_account = $bookerAccount->acc_no;
+                        $marchantTransaction->to_account = $brandAccount->acc_no;
+                        $marchantTransaction->amount = $bookingAmount;
+                        $marchantTransaction->tax = $tax;
+                        $marchantTransaction->tax_amount = $taxAmount;
+                        $marchantTransaction->net_amount = $netAmount;
+                        $marchantTransaction->trans_type = "deposit";
+                        $marchantTransaction->amount_type = "cash";
+                        $marchantTransaction->note = "Amount deposit from: " . $bookerAccount->acc_no . " To My account: " . $brandAccount->acc_no . " for Booking. Booking Amount:" . $bookingAmount . "Tk  Tax:" . $tax . "% TaxAmount:" . $taxAmount . "Tk  You paid amount: " . $netAmount . "Tk" . " Admin cut: " . $taxAmount . " Tk";
+                        $marchantTransaction->trans_key ="".$trans_key;
+                        $marchantTransaction->save();
 
 
                         //booker transaction
                         $bookerTransaction = new Transaction();
                         $bookerTransaction->vechicle_id = $vid;
-                        $bookerTransaction->trans_by = $bookerId;
+                        $bookerTransaction->trans_by = "user";
+                        $bookerTransaction->trans_by_id = $bookerId;
                         $bookerTransaction->trans_for = "user";
+                        $bookerTransaction->trans_for_id = $bookerId;
                         $bookerTransaction->from_account = $bookerAccount->acc_no;
                         $bookerTransaction->to_account = $brandAccount->acc_no;
                         $bookerTransaction->amount = $bookingAmount;
@@ -143,18 +154,21 @@ class VehiclesController extends Controller
                         $bookerTransaction->trans_type = "withdraw";
                         $bookerTransaction->amount_type = "cash";
                         $bookerTransaction->note = "Amount withdraw from My account: " . $bookerAccount->acc_no . " Transfer To Brand account: " . $brandAccount->acc_no . " for Booking amount: " . $bookingAmount . "Tk";
+                        $bookerTransaction->trans_key ="".$trans_key;
                         $bookerTransaction->save();
 
 
                         //site owner transaction
-                        $siteAccount = Account::where(['holder_ref' => 2, 'holder_type' => 'Super Admin', 'isDefault' => 1])->first();
+                        $siteAccount = Account::where(['holder_ref' => $superAdminId, 'holder_type' => 'Super Admin', 'isDefault' => 1])->first();
                         $siteAccount->amount += $taxAmount;
                         $siteAccount->save();
 
                         $siteOwnerTransaction = new Transaction();
                         $siteOwnerTransaction->vechicle_id = $vid;
-                        $siteOwnerTransaction->trans_by = $bookerId;
+                        $siteOwnerTransaction->trans_by_id = $bookerId;
+                        $siteOwnerTransaction->trans_by = "user";
                         $siteOwnerTransaction->trans_for = "super-admin";
+                        $siteOwnerTransaction->trans_for_id = $superAdminId;
                         $siteOwnerTransaction->from_account = $brandAccount->acc_no;
                         $siteOwnerTransaction->to_account = $siteAccount->acc_no;
                         $siteOwnerTransaction->amount = 0;
@@ -164,6 +178,7 @@ class VehiclesController extends Controller
                         $siteOwnerTransaction->trans_type = "tax";
                         $siteOwnerTransaction->amount_type = "cash";
                         $siteOwnerTransaction->note = "Amount deposit from: " . $bookerAccount->acc_no . " To My account: " . $siteAccount->acc_no . " for Booking amount: " . $bookingAmount . "Tk Tax:" . $tax . "% TaxAmount:" . $taxAmount . "Tk Your paid amount: " . $taxAmount . "Tk";
+                        $siteOwnerTransaction->trans_key = "".$trans_key;
                         $siteOwnerTransaction->save();
 
                         DB::table("solds")
@@ -175,7 +190,6 @@ class VehiclesController extends Controller
                         return redirect()->route("home.index")->with(["message" => "Booking placed success"]);
 
                     }catch (\Exception $exception){
-                        dd($exception->getTrace());
                         return redirect()->back()->with(["message_error" => "Booking placed failed"]);
                     }
                 } else {
@@ -186,6 +200,13 @@ class VehiclesController extends Controller
             }
 
         }
+    }
+
+
+    public function generateTransKey()
+    {
+        $OTP = rand(100000, 999999);
+        return $OTP;
     }
 
     public function checkPermission(){

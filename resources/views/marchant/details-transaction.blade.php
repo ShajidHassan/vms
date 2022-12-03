@@ -31,7 +31,7 @@ position:relative;
                               Form Account: {{ $transaction->from_account ?? '' }}
                           </div>
                           <div class="control-group" >
-                              Form Account: {{ $transaction->to_account ?? '' }}
+                              To Account: {{ $transaction->to_account ?? '' }}
                           </div>
                           <div class="control-group">
                             Principal Amount:{{ $transaction->amount ?? '' }}

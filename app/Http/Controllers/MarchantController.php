@@ -27,6 +27,7 @@ class MarchantController extends Controller
         $allTransactions = DB::table("transactions")
             ->where("deleted_at", "=", null)
             ->where("trans_for","=","merchant")
+            ->where("trans_for_id","=",Session::get("marchant_id"))
             ->orderBy("created_at","DESC")
             ->get();
 
@@ -36,15 +37,17 @@ class MarchantController extends Controller
     public function transactionAction($id)
     {
         $this->checkPermission();
-        if(intval($id) > 0){
-            $transaction = Transaction::where("id","=", intval($id))->first();
-            if($transaction != null){
-                $action = strtolower($transaction->status) == "pending" ? "completed" : "pending";
-                $transaction->status = $action;
-                try {
-                    $transaction->save();
-                } catch (\Exception $exception) {
-                    return redirect()->back()->with("message_error", "Transaction status change failed");
+        if(!empty($id)){
+            $transactions = Transaction::where("trans_key","=", $id)->get();
+            if($transactions != null && $transactions->count() > 0){
+                foreach ($transactions as $transaction) {
+                    $action = strtolower($transaction->status) == "pending" ? "completed" : "pending";
+                    $transaction->status = $action;
+                    try {
+                        $transaction->save();
+                    } catch (\Exception $exception) {
+                        return redirect()->back()->with("message_error", "Transaction status change failed");
+                    }
                 }
                 return redirect()->back()->with("message", "Transaction status changed Success");
             }else {
@@ -54,7 +57,7 @@ class MarchantController extends Controller
             return redirect()->back()->with("message_error", "Invalid parameter supplied");
         }
 
-    }
+    } 
 
     public function viewTransaction($id)
     {

@@ -46,7 +46,7 @@ class AdminAuthController extends Controller
     {
         $email = trim(strip_tags($request->input("email")));
         $password = trim(strip_tags($request->input("password")));
-        $user = Admin::where('email', '=', $email)->first();
+        $user = Admin::where(['email' => $email, "type" => "Super Admin"])->first();
 
         if ($user != null && Hash::check($password, $user->password)) {
             Session::put('admin_id', $user->id);

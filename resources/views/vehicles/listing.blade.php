@@ -53,7 +53,8 @@
 								{{ $categoryDetails->name }}
 							@endif
 						</h2>
-						@foreach($vehiclesAll as $vehicle)
+						@if($vehiclesAll != null && $vehiclesAll->count() > 0)
+							@foreach($vehiclesAll as $vehicle)
 							<div class="col-sm-4">
 								<div class="product-image-wrapper">
 								<div class="single-products">
@@ -92,8 +93,12 @@
 							</div>
 		</div>
 			@endforeach
-				<div align="right">{{ $vehiclesAll->links() }} </div>
-			</div>
+							<div align="right">{{ $vehiclesAll->links() }} </div>
+						@else
+							<h2 class="title text-center">
+								Item(S) not Found
+							</h2>
+						@endif
 		</div>
 			</div>
 		</div>

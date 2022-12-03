@@ -23,8 +23,9 @@ class UserController extends Controller
     public function transaction()
     {
         $this->checkPermission();
-        $allTransactions = Transaction::where("trans_by", Session::get('user_id'))
+       $allTransactions = Transaction::where("trans_by_id", Session::get('user_id'))
             ->where("trans_for", "user")
+            ->where("trans_for_id",Session::get('user_id'))
             ->orderBy("created_at","DESC")
             ->get();
         return view('users.transactions', compact('allTransactions'));

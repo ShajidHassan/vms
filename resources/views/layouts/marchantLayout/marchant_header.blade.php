@@ -2,7 +2,7 @@
 <!--top-Header-menu-->
 <div id="user-nav" class="navbar navbar-inverse">
   <ul class="nav">
-    <li  class="dropdown" id="profile-messages" ><a title="" href="#" data-toggle="dropdown" data-target="#profile-messages" class="dropdown-toggle" style="font-size: 16px; color: black; background: #FF0000 ;"><i class="icon icon-user"></i>  <strong><span class="text" >{{ \Illuminate\Support\Facades\Session::get('user_name') }}</</span> </strong><b class="caret"></b></a>
+    <li  class="dropdown" id="profile-messages" ><a title="" href="#" data-toggle="dropdown" data-target="#profile-messages" class="dropdown-toggle" style="font-size: 16px; color: black; background: #FF0000 ;"><i class="icon icon-user"></i>  <strong><span class="text" >{{ \Illuminate\Support\Facades\Session::get('marchant_name') }}</</span> </strong><b class="caret"></b></a>
       <ul class="dropdown-menu">
         <li>
             <a onclick="window.confirm('Are You Sure ?') && document.getElementById('logout').submit(); return false;" style="font-size:16px;color:red;background: black">
